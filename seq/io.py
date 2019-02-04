@@ -56,6 +56,8 @@ def transform_actions(in_path,out_path,transform,
     if(not actions):
         raise Exception("No actions found at "+ in_path)
     new_actions=[ action_i(transform,whole_seq=whole_seq)  for action_i in actions]
+    if(not out_path):
+        return new_actions
     save_actions=ActionWriter(img_seq=img_out)
     save_actions(new_actions,out_path)
 
