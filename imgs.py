@@ -3,6 +3,17 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 import torch,torch.utils.data
 
+class ActionDataset(torch.utils.data.Dataset):
+    def __init__(self, actions):
+        self.actions = actions
+
+    def __getitem__(self, index):
+        action_i=self.actions[index]
+        return torch.Tensor(action_i.img_seq[0]),action_i.cat
+
+    def __len__(self):
+        return self.tensors[0].size(0)
+
 class SplineUpsampling(object):
     def __init__(self,new_size=128):
         self.new_size=new_size
@@ -27,8 +38,9 @@ def img_transform(in_path,out_path=None):
     
     new_actions=seq.io.transform_actions(in_path,out_path,action_helper,
     	            img_in=False,img_out=True,whole_seq=True)
-    new_actions=torch.stack([torch.Tensor(action_i.img_seq[0]) for action_i in new_actions])
-    return torch.utils.data.TensorDataset(new_actions)
+    return ActionDataset(new_actions)
+    #new_actions=torch.stack([torch.Tensor(action_i.img_seq[0]) for action_i in new_actions])
+    #return torch.utils.data.TensorDataset(new_actions)
     #new_actions=np.array([action_i.img_seq[0] for action_i in new_actions])
     #print(new_actions.shape)
 
