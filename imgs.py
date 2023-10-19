@@ -1,47 +1,20 @@
-import seq.io
-import numpy as np
-from scipy.interpolate import CubicSpline
-import torch,torch.utils.data
+import cv2
+import utils
 
-class ActionDataset(torch.utils.data.Dataset):
-    def __init__(self, actions):
-        self.actions = actions
+class ActionDict(dict):
+    def __init__(self, arg=[]):
+        super(ActionDict, self).__init__(arg)
 
-    def __getitem__(self, index):
-        action_i=self.actions[index]
-        return torch.Tensor(action_i.img_seq[0]),action_i.cat
+def read_action(in_path:str):
+    action_dict=ActionDict()
+    for path_i in utils.top_files(in_path):
+        name_i=path_i.split('/')[-1]
+        action_i=[cv2.imread(path_j,0)
+                for path_j in utils.top_files(path_i)]
+        action_dict[name_i]=action_i
+    return action_dict
 
-    def __len__(self):
-        return self.tensors[0].size(0)
 
-class SplineUpsampling(object):
-    def __init__(self,new_size=128):
-        self.new_size=new_size
-
-    def __call__(self,feat_i):
-        old_size=feat_i.shape[0]
-        old_x=np.arange(old_size)
-        old_x=old_x.astype(float)  
-    	step=float(self.new_size)/float(old_size)
-        old_x*=step  	
-    	cs=CubicSpline(old_x,feat_i)
-    	new_x=np.arange(self.new_size)
-    	print(new_x.shape)
-    	return cs(new_x)
-
-def img_transform(in_path,out_path=None):
-    upsampling=SplineUpsampling()
-    def action_helper(img_seq):
-        img_seq=np.array(img_seq).T
-        img_action=np.array([ upsampling(feat_i) for feat_i in img_seq])
-        return [img_action]
-    
-    new_actions=seq.io.transform_actions(in_path,out_path,action_helper,
-    	            img_in=False,img_out=True,whole_seq=True)
-    return ActionDataset(new_actions)
-    #new_actions=torch.stack([torch.Tensor(action_i.img_seq[0]) for action_i in new_actions])
-    #return torch.utils.data.TensorDataset(new_actions)
-    #new_actions=np.array([action_i.img_seq[0] for action_i in new_actions])
-    #print(new_actions.shape)
-
-img_transform('all')#,'imgs')
+in_path='../MSR/frames'
+action_dict= read_action(in_path)
+print(action_dict.keys())
