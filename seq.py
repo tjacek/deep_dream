@@ -22,6 +22,7 @@ def read_seq(in_path):
         seq_dict[name_i]=seq_i
     return seq_dict
 
-in_path='../DTW/3DHOI/seqs/corl'
-seq_dict= read_seq(in_path)
-print(seq_dict.dim())
+if __name__ == "__main__":
+    in_path='../DTW/3DHOI/seqs/corl'
+    seq_dict= read_seq(in_path)
+    print(seq_dict.dim())

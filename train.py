@@ -1,21 +1,25 @@
-import tensorflow as tf
-import keras
-print(tf.__version__)
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report#precision_recall_fscore_support
+import dtw,seq,utils
 
-mnist=keras.datasets.mnist
+def read_all_feats(in_path:str):
+    all_feats={ path_i.split('/')[-1]:
+                dtw.read_pairs(f'{path_i}/pairs')
+        for path_i in utils.top_files(in_path)}
+    
+    nn_exp(all_feats)
 
-(x_train, y_train),(x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
+def nn_exp(all_exp):
+    for type_i,pairs_i in all_exp.items():
+        y_pred,y_true=pairs_i.knn()
+#        acc_i=accuracy_score(y_pred,y_true)
+        metrics_i=classification_report(y_true,y_pred)
+        print(type_i)
+        print(metrics_i)
+#        print(f'{type_i}:{acc_i:.2f}')
 
-model = tf.keras.models.Sequential([
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dense(512, activation=tf.nn.relu),
-  tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.Dense(10, activation=tf.nn.softmax)
-])
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
-
-model.fit(x_train, y_train, epochs=5)
-model.evaluate(x_test, y_test)
+datasets=['MSR','MHAD','3DHOI']
+k=2
+in_path=f'../DTW/{datasets[k]}'
+print(in_path)
+read_all_feats(in_path)
