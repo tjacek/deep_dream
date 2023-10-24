@@ -5,11 +5,7 @@ import dtw,seq,utils
 def read_all_feats(in_path:str):
     all_feats={ path_i.split('/')[-1]:
                 dtw.read_pairs(f'{path_i}/pairs')
-        for path_i in utils.top_files(in_path)}
-    
-    nn_exp(all_feats)
-
-def nn_exp(all_exp):
+        for path_i in utils.top_files(in_path)}    
     for type_i,pairs_i in all_exp.items():
         y_pred,y_true=pairs_i.knn()
 #        acc_i=accuracy_score(y_pred,y_true)
@@ -18,8 +14,16 @@ def nn_exp(all_exp):
         print(metrics_i)
 #        print(f'{type_i}:{acc_i:.2f}')
 
+def hc_exp(all_exp):
+    all_seqs={ path_i.split('/')[-1]:
+                seq.read_seq(f'{path_i}/seqs')
+        for path_i in utils.top_files(in_path)}
+    for type_i,seqs_i in all_seqs.items():
+        feat_dict= seqs_i.as_features()
+        print(feat_dict)
+
 datasets=['MSR','MHAD','3DHOI']
 k=2
 in_path=f'../DTW/{datasets[k]}'
 print(in_path)
-read_all_feats(in_path)
+hc_exp(in_path)

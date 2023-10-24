@@ -9,6 +9,16 @@ class SeqDict(dict):
         seq_i= list(self.values())[0]
         return seq_i.shape[-1]
 
+    def as_features(self):
+        feat_dict={name_i:np.std(seq_i,axis=0)
+                    for name_i,seq_i in self.items()}
+        return feat_dict
+#        names=list(self.keys())
+#        train,test=utils.split(names)
+
+#    def stats(self):
+#        for name_i,seq_i in self.items():
+
 def read_seq(in_path):
     seq_dict=SeqDict()
     for path_i in utils.top_files(in_path):
