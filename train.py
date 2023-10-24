@@ -1,5 +1,6 @@
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report#precision_recall_fscore_support
+from sklearn.svm import SVC
 import dtw,seq,utils
 
 def read_all_feats(in_path:str):
@@ -20,10 +21,18 @@ def hc_exp(all_exp):
         for path_i in utils.top_files(in_path)}
     for type_i,seqs_i in all_seqs.items():
         feat_dict= seqs_i.as_features()
-        print(feat_dict)
+        train_dict,test_dict=feat_dict.split()
+        X_train,y_train=train_dict.as_dataset()
+        X_test,y_test=test_dict.as_dataset()
+        clf_i=SVC()
+        clf_i.fit(X_train,y_train)
+        y_pred=clf_i.predict(X_test)
+        metrics_i=classification_report(y_test,y_pred)
+        print(type_i)
+        print(metrics_i)
 
 datasets=['MSR','MHAD','3DHOI']
-k=2
+k=1
 in_path=f'../DTW/{datasets[k]}'
 print(in_path)
 hc_exp(in_path)

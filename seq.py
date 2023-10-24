@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.stats import skew,pearsonr
+
 import utils
 
 class SeqDict(dict):
@@ -10,14 +12,41 @@ class SeqDict(dict):
         return seq_i.shape[-1]
 
     def as_features(self):
-        feat_dict={name_i:np.std(seq_i,axis=0)
-                    for name_i,seq_i in self.items()}
-        return feat_dict
-#        names=list(self.keys())
-#        train,test=utils.split(names)
+        def compute_feat(seq_i):
+            mean_i=np.mean(seq_i,axis=0)
+            std_i=np.std(seq_i,axis=0)
+            skew_i=skew(seq_i,axis=0)
 
-#    def stats(self):
-#        for name_i,seq_i in self.items():
+            all_feats=[mean_i,std_i,skew_i]
+            return np.concatenate(all_feats,axis=0)
+        feat_dict={name_i:compute_feat(seq_i)
+                    for name_i,seq_i in self.items()
+                    if(len(seq_i.shape)>1)}
+        return FeatDict(feat_dict)
+
+class FeatDict(dict):
+    def __init__(self, arg=[]):
+        super(FeatDict, self).__init__(arg)
+
+    def as_dataset(self):
+        X,y=[],[]
+        for name_i,data_i in self.items():
+            if(type(data_i)!=np.ndarray):
+                break
+            data_i=np.nan_to_num(data_i)
+            if(len(data_i)>0):
+                X.append(np.nan_to_num(data_i))
+                y.append(utils.get_cat(name_i))
+        return np.array(X),y
+
+    def split(self):
+        names=list(self.keys())
+        train,test=utils.split(names)
+        train_dict={ train_i:self[train_i]
+                     for train_i in train}
+        test_dict={ test_i:self[test_i]
+                     for test_i in test}
+        return FeatDict(train_dict),FeatDict(test_dict)    
 
 def read_seq(in_path):
     seq_dict=SeqDict()

@@ -9,6 +9,7 @@ class ActionDict(dict):
     def compute_feats(self,extractors):
         def helper(frame_j):
             points=nonzero_points(frame_j)
+            
         hc_dict={}
         for name_i,action_i in self.items():
             seq_i=[ helper(frame_j)
