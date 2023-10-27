@@ -23,14 +23,14 @@ class DTWpairs(object):
         return self.pairs[key1][key2]
 
     def get_features(self):
-        names=list(self.keys())
+        names=list(self.pairs.keys())
         train,test=utils.split(names)
         feat_dict={}
         for name_i in names:
-            feat_i=np.array([ self[name_i][train_j]
+            feat_i=np.array([ self.pairs[name_i][train_j]
                         for train_j in train])
             feat_dict[name_i]=feat_i
-        return feat_dict
+        return seq.FeatDict( feat_dict)
     
     def knn(self,k=1):
         names=list(self.pairs.keys())

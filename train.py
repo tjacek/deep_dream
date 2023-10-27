@@ -3,31 +3,34 @@ from sklearn.metrics import accuracy_score,precision_recall_fscore_support
 from sklearn.svm import SVC
 import dtw,seq,utils
 
-def read_all_feats(in_path:str):
-    all_feats={ path_i.split('/')[-1]:
-                dtw.read_pairs(f'{path_i}/pairs')
-        for path_i in utils.top_files(in_path)}    
-    for type_i,pairs_i in all_exp.items():
-        y_pred,y_true=pairs_i.knn()
-        acc_i=accuracy_score(y_pred,y_true)
+def dtw_knn(in_path:str):
+    all_pairs=read_pairs(in_path)
+    lines=[]
+    for type_i,pairs_i in all_pairs.items():
+        y_pred,y_test=pairs_i.knn()
+        metric_i=get_metrics(y_test,y_pred)
+        lines.append(f'knn,{type_i},{metric_i}')
+    print('\n'.join(lines))
+#        acc_i=accuracy_score(y_pred,y_true)
 
-def hc_exp(all_exp):
+def dtw_feats(all_exp):
+    all_pairs=read_pairs(in_path)
+    lines=[]
+    for type_i,pairs_i in all_pairs.items():
+        feat_i= pairs_i.get_features()
+        y_pred,y_test=train_clf(feat_i)
+        metric_i=get_metrics(y_test,y_pred)
+        lines.append(f'dtw_feats,{type_i},{metric_i}')
+    print('\n'.join(lines))
+
+def hc_feats(all_exp):
     all_feats=read_feats(in_path)
     lines=[]
     for type_i,feat_i in all_feats.items():
-#        feat_dict= seqs_i.as_features()
         y_test,y_pred=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
-        lines.append(f'{type_i},{metric_i}')
+        lines.append(f'hc_feats,{type_i},{metric_i}')
     print('\n'.join(lines))    
-
-
-#def all_exp(all_exp):
-#    all_seqs={ path_i.split('/')[-1]:
-#                seq.read_seq(f'{path_i}/seqs')
-#        for path_i in utils.top_files(in_path)}
-#    for type_i,seqs_i in all_seqs.items():
-#        feat_dict= seqs_i.as_features()
 
 def read_feats(in_path):
     all_seqs={ path_i.split('/')[-1]:
@@ -35,7 +38,13 @@ def read_feats(in_path):
           for path_i in utils.top_files(in_path)}
     all_feats={name_i:seqs_i.as_features()
                  for name_i,seqs_i in all_seqs.items()}
+    all_feats['all']=seq.concat_feat(all_feats)
     return all_feats
+
+def read_pairs(in_path):
+    return { path_i.split('/')[-1]:
+                dtw.read_pairs(f'{path_i}/pairs')
+              for path_i in utils.top_files(in_path)} 
 
 def get_metrics(y_true,y_pred):
     acc_i=accuracy_score(y_true,y_pred)
@@ -56,7 +65,9 @@ def train_clf(feat_dict):
     return y_test,y_pred
 
 datasets=['MSR','MHAD','3DHOI']
-k=1
+k=2
 in_path=f'../DTW/{datasets[k]}'
 print(in_path)
-hc_exp(in_path)
+hc_feats(in_path)
+dtw_knn(in_path)
+dtw_feats(in_path)

@@ -50,12 +50,13 @@ class FeatDict(dict):
 
 def concat_feat(all_dicts):
     full_dict=FeatDict()
-    names=  list(all_feats.values())[0].keys()
+    names=  list(all_dicts.values())[0].keys()
     for name_i in names:
-        all_feats=[ dict_j[name_i] for dict_j in all_dicts]
+        all_feats=[ dict_j[name_i] 
+            for dict_j in all_dicts.values()]
         full_dict[name_i]=np.concatenate(all_feats,axis=0)
     return full_dict
-    
+
 def read_seq(in_path):
     seq_dict=SeqDict()
     for path_i in utils.top_files(in_path):
