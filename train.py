@@ -13,11 +13,13 @@ def dtw_knn(in_path:str):
     print('\n'.join(lines))
 #        acc_i=accuracy_score(y_pred,y_true)
 
-def dtw_feats(all_exp):
+def dtw_feats(all_exp,n_feats=None):
     all_pairs=read_pairs(in_path)
     lines=[]
     for type_i,pairs_i in all_pairs.items():
         feat_i= pairs_i.get_features()
+        if(not (n_feats is None)):
+            feat_i=feat_i.selection(n_feats=n_feats)
         y_pred,y_test=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
         lines.append(f'dtw_feats,{type_i},{metric_i}')

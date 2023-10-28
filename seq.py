@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import skew,pearsonr
-
+from sklearn.feature_selection import RFE
+from sklearn.svm import SVR
 import utils
 
 class SeqDict(dict):
@@ -39,8 +40,28 @@ class FeatDict(dict):
                 y.append(utils.get_cat(name_i))
         return np.array(X),y
 
-    def split(self):
+    def selection(self,n_feats=100):
+        estimator = SVR(kernel="linear")
+        selector = RFE(estimator=estimator, 
+                       n_features_to_select=n_feats, 
+                       step=1)
+        train,test=self.split()
+        X_train,y_test=train.as_dataset()
+        selector = selector.fit(X_train, y_test)
+        X,y=self.as_dataset() 
+        new_X=selector.transform(X) 
+        names=self.names()
+        raw_dict={name_i:x_i 
+             for name_i,x_i in zip(new_X,names)}
+        return FeatDict(raw_dict)
+
+    def names(self):
         names=list(self.keys())
+        names.sort()
+        return names
+
+    def split(self):
+        names=self.names()
         train,test=utils.split(names)
         train_dict={ train_i:self[train_i]
                      for train_i in train}
