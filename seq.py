@@ -91,6 +91,15 @@ def read_seq(in_path):
         seq_dict[name_i]=seq_i
     return seq_dict
 
+def concat_feat(all_dicts):
+    full_dict=SeqDict()
+    names=  list(all_dicts.values())[0].keys()
+    for name_i in names:
+        all_seqs=[ dict_j[name_i] 
+            for dict_j in all_dicts.values()]
+        full_dict[name_i]=np.concatenate(all_seqs,axis=0)
+    return full_dict
+    
 if __name__ == "__main__":
     in_path='../DTW/3DHOI/seqs/corl'
     seq_dict= read_seq(in_path)
