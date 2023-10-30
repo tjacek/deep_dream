@@ -11,7 +11,6 @@ def dtw_knn(in_path:str):
         metric_i=get_metrics(y_test,y_pred)
         lines.append(f'knn,{type_i},{metric_i}')
     print('\n'.join(lines))
-#        acc_i=accuracy_score(y_pred,y_true)
 
 def dtw_feats(all_exp,n_feats=None):
     all_pairs=read_pairs(in_path)
@@ -66,10 +65,15 @@ def train_clf(feat_dict):
     y_pred=clf_i.predict(X_test)
     return y_test,y_pred
 
-datasets=['MSR','MHAD','3DHOI']
-k=2
-in_path=f'../DTW/{datasets[k]}'
+def base_exp(in_path,datasets=None):
+    if(datasets is None):
+        datasets=['MSR','MHAD','3DHOI']
+    algs=[hc_feats,dtw_knn,dtw_feats]
+    for data_i in datasets:
+        path_i=f'{in_path}/{data_i}'
+        for alg_j in algs:
+            alg_j(path_i)
+
+in_path=f'../DTW'#{datasets[k]}'
 print(in_path)
-hc_feats(in_path)
-dtw_knn(in_path)
-dtw_feats(in_path)
+base_exp(in_path)
