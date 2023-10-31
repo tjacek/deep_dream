@@ -12,7 +12,7 @@ def dtw_knn(in_path:str):
         lines.append(f'knn,{type_i},{metric_i}')
     print('\n'.join(lines))
 
-def dtw_feats(all_exp,n_feats=None):
+def dtw_feats(in_path,n_feats=None):
     all_pairs=read_pairs(in_path)
     lines=[]
     for type_i,pairs_i in all_pairs.items():
@@ -24,7 +24,7 @@ def dtw_feats(all_exp,n_feats=None):
         lines.append(f'dtw_feats,{type_i},{metric_i}')
     print('\n'.join(lines))
 
-def hc_feats(all_exp):
+def hc_feats(in_path):
     all_feats=read_feats(in_path)
     lines=[]
     for type_i,feat_i in all_feats.items():
@@ -55,6 +55,8 @@ def get_metrics(y_true,y_pred):
     metrics_i=[acc_i]+list(metrics_i)[:-1]
     metrics_i=','.join([ f'{m_j:.4f}' for m_j in metrics_i])
     return metrics_i
+
+#def partial_metrics(y_true,y_pred):    
 
 def train_clf(feat_dict):
     train_dict,test_dict=feat_dict.split()
