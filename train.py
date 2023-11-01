@@ -3,16 +3,18 @@ from sklearn.metrics import accuracy_score,precision_recall_fscore_support
 from sklearn.svm import SVC
 import dtw,seq,utils
 
-def dtw_knn(in_path:str):
+def dtw_knn(in_path:str,verbose=0):
     all_pairs=read_pairs(in_path)
     lines=[]
     for type_i,pairs_i in all_pairs.items():
         y_pred,y_test=pairs_i.knn()
         metric_i=get_metrics(y_test,y_pred)
-        lines.append(f'knn,{type_i},{metric_i}')
-    print('\n'.join(lines))
+        lines.append(f'dtw_knn,{type_i},{metric_i}')
+    if(verbose):
+        print('\n'.join(lines))
+    return lines
 
-def dtw_feats(in_path,n_feats=None):
+def dtw_feats(in_path,n_feats=None,verbose=0):
     all_pairs=read_pairs(in_path)
     lines=[]
     for type_i,pairs_i in all_pairs.items():
@@ -22,16 +24,20 @@ def dtw_feats(in_path,n_feats=None):
         y_pred,y_test=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
         lines.append(f'dtw_feats,{type_i},{metric_i}')
-    print('\n'.join(lines))
+    if(verbose):
+        print('\n'.join(lines))
+    return lines
 
-def hc_feats(in_path):
+def hc_feats(in_path,verbose=0):
     all_feats=read_feats(in_path)
     lines=[]
     for type_i,feat_i in all_feats.items():
         y_test,y_pred=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
         lines.append(f'hc_feats,{type_i},{metric_i}')
-    print('\n'.join(lines))    
+    if(verbose):
+        print('\n'.join(lines))    
+    return lines
 
 def read_feats(in_path):
     all_seqs={ path_i.split('/')[-1]:
@@ -70,12 +76,15 @@ def train_clf(feat_dict):
 def base_exp(in_path,datasets=None):
     if(datasets is None):
         datasets=['MSR','MHAD','3DHOI']
-    algs=[hc_feats,dtw_knn,dtw_feats]
+    algs=[dtw_knn]#hc_feats,dtw_knn,dtw_feats]
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
         for alg_j in algs:
-            alg_j(path_i)
-
+            lines=alg_j(path_i)
+            lines=[ f'{data_i},{line_k}' 
+                    for line_k in lines]
+            print('\n'.join(lines))
+            
 in_path=f'../DTW'#{datasets[k]}'
 print(in_path)
 base_exp(in_path)
