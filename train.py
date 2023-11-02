@@ -1,4 +1,5 @@
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support
+from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
 from sklearn.svm import SVC
 import dtw,seq,utils
@@ -33,7 +34,8 @@ def hc_feats(in_path,verbose=0):
     lines=[]
     for type_i,feat_i in all_feats.items():
         y_test,y_pred=train_clf(feat_i)
-        metric_i=get_metrics(y_test,y_pred)
+#        metric_i=get_metrics(y_test,y_pred)
+        metric_i=partial_metrics(y_test,y_pred)
         lines.append(f'hc_feats,{type_i},{metric_i}')
     if(verbose):
         print('\n'.join(lines))    
@@ -62,7 +64,10 @@ def get_metrics(y_true,y_pred):
     metrics_i=','.join([ f'{m_j:.4f}' for m_j in metrics_i])
     return metrics_i
 
-#def partial_metrics(y_true,y_pred):    
+def partial_metrics(y_true,y_pred):    
+    cf = confusion_matrix(y_true, y_pred)
+    partial_acc=cf.diagonal()/cf.sum(axis=1)
+    return partial_acc
 
 def train_clf(feat_dict):
     train_dict,test_dict=feat_dict.split()
@@ -76,7 +81,7 @@ def train_clf(feat_dict):
 def base_exp(in_path,datasets=None):
     if(datasets is None):
         datasets=['MSR','MHAD','3DHOI']
-    algs=[dtw_knn]#hc_feats,dtw_knn,dtw_feats]
+    algs=[hc_feats]#hc_feats,dtw_knn,dtw_feats]
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
         for alg_j in algs:
