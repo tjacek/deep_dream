@@ -89,7 +89,17 @@ def base_exp(in_path,datasets=None):
             lines=[ f'{data_i},{line_k}' 
                     for line_k in lines]
             print('\n'.join(lines))
-            
+
+def compare_knn(in_path):
+    all_pairs=read_pairs(in_path)
+    metric_dict={}
+    for type_i,pairs_i in all_pairs.items():
+        y_pred,y_test=pairs_i.knn()
+        metric_i=partial_metrics(y_test,y_pred)
+        metric_dict[type_i]=metric_i
+    print(metric_dict)
+
 in_path=f'../DTW'#{datasets[k]}'
 print(in_path)
-base_exp(in_path)
+compare_knn(f'{in_path}/MSR')
+#base_exp(in_path)
