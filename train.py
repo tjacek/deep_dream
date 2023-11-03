@@ -2,6 +2,7 @@ from sklearn.metrics import accuracy_score,precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
 from sklearn.svm import SVC
+import pandas as pd
 import dtw,seq,utils
 
 def dtw_knn(in_path:str,verbose=0):
@@ -97,7 +98,8 @@ def compare_knn(in_path):
         y_pred,y_test=pairs_i.knn()
         metric_i=partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
-    print(metric_dict)
+    df= pd.DataFrame.from_dict(metric_dict)
+    print(df)
 
 in_path=f'../DTW'#{datasets[k]}'
 print(in_path)
