@@ -3,6 +3,8 @@ from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
 from sklearn.svm import SVC
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import dtw,seq,utils
 
 def dtw_knn(in_path:str,verbose=0):
@@ -99,7 +101,21 @@ def compare_knn(in_path):
         metric_i=partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
     df= pd.DataFrame.from_dict(metric_dict)
-    print(df)
+    show_scatter(df)
+
+def show_scatter(df):
+    fig, ax = plt.subplots()
+    x=np.arange(len(df))
+    colors=['blue','red','green','yellow']
+    for i,col_i in enumerate(df.columns):
+        feat_i=df[col_i].tolist()
+
+        ax.scatter(x=x, 
+                   y=feat_i, #s=sizes, 
+                   c=colors[i],#'red', 
+                   vmin=0, 
+                   vmax=100)
+    plt.show()
 
 in_path=f'../DTW'#{datasets[k]}'
 print(in_path)
