@@ -101,7 +101,26 @@ def compare_knn(in_path):
         metric_i=partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
     df= pd.DataFrame.from_dict(metric_dict)
-    show_scatter(df)
+    show_bar(df,k=1)
+
+def show_bar(df,step=10,k=0):
+    fig, ax = plt.subplots()
+    x=np.arange(step)+k*step
+    diff=[0.2,0.0,-0.2,-0.4]
+    labels={'corl':'I',
+            'max_z':'II',
+            'std':"III",
+            'skew':"IV"}
+    for i,col_i in enumerate(['corl','max_z','std','skew']):
+        feat_i=df[col_i].tolist()
+        feat_i=feat_i[step*k:step*(k+1)]
+        plt.bar(x - diff[i],feat_i, 0.2, 
+                label = labels[col_i]) 
+    plt.xticks(x, [str(x_i) for x_i in x]) 
+    plt.xlabel("Class") 
+    plt.ylabel("Accuracy") 
+    plt.legend() 
+    plt.show()
 
 def show_scatter(df):
     fig, ax = plt.subplots()
@@ -109,10 +128,9 @@ def show_scatter(df):
     colors=['blue','red','green','yellow']
     for i,col_i in enumerate(df.columns):
         feat_i=df[col_i].tolist()
-
         ax.scatter(x=x, 
-                   y=feat_i, #s=sizes, 
-                   c=colors[i],#'red', 
+                   y=feat_i, 
+                   c=colors[i],
                    vmin=0, 
                    vmax=100)
     plt.show()
