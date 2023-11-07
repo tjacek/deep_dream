@@ -101,11 +101,11 @@ def compare_knn(in_path):
         metric_i=partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
     df= pd.DataFrame.from_dict(metric_dict)
-    show_bar(df,k=1)
+    show_bar(df,k=0)
 
 def show_bar(df,step=10,k=0):
     fig, ax = plt.subplots()
-    x=np.arange(step)+k*step
+    x=np.arange(step)+k*step +1
     diff=[0.2,0.0,-0.2,-0.4]
     labels={'corl':'I',
             'max_z':'II',
@@ -116,6 +116,7 @@ def show_bar(df,step=10,k=0):
         feat_i=feat_i[step*k:step*(k+1)]
         plt.bar(x - diff[i],feat_i, 0.2, 
                 label = labels[col_i]) 
+    plt.title('DTW KNN on MSR-Action3D dataset')
     plt.xticks(x, [str(x_i) for x_i in x]) 
     plt.xlabel("Class") 
     plt.ylabel("Accuracy") 
