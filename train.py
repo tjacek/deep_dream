@@ -37,7 +37,6 @@ def hc_feats(in_path,verbose=0):
     lines=[]
     for type_i,feat_i in all_feats.items():
         y_test,y_pred=train_clf(feat_i)
-#        metric_i=get_metrics(y_test,y_pred)
         metric_i=partial_metrics(y_test,y_pred)
         lines.append(f'hc_feats,{type_i},{metric_i}')
     if(verbose):
@@ -136,7 +135,8 @@ def show_scatter(df):
                    vmax=100)
     plt.show()
 
-in_path=f'../DTW'#{datasets[k]}'
-print(in_path)
-compare_knn(f'{in_path}/MSR')
+if __name__ == "__main__":
+    in_path=f'../DTW'#{datasets[k]}'
+    print(in_path)
+    compare_knn(f'{in_path}/MSR')
 #base_exp(in_path)
