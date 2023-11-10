@@ -31,6 +31,7 @@ class DTWpairs(object):
                         for train_j in train])
             feat_dict[name_i]=feat_i
         return seq.FeatDict( feat_dict)
+
     
     def knn(self,k=1):
         names=list(self.pairs.keys())
