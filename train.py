@@ -2,9 +2,7 @@ from sklearn.metrics import accuracy_score,precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
 from sklearn.svm import SVC
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import dtw,seq,utils
 
 def dtw_knn(in_path:str,verbose=0):
@@ -91,8 +89,6 @@ def base_exp(in_path,datasets=None):
             lines=[ f'{data_i},{line_k}' 
                     for line_k in lines]
             print('\n'.join(lines))
-
-
 
 if __name__ == "__main__":
     base_exp(in_path)

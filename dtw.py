@@ -32,7 +32,6 @@ class DTWpairs(object):
             feat_dict[name_i]=feat_i
         return seq.FeatDict( feat_dict)
 
-    
     def knn(self,k=1):
         names=list(self.pairs.keys())
         train,test=utils.split(names)
@@ -66,7 +65,7 @@ def read_pairs(in_path):
         return DTWpairs(raw_pairs)
 
 def make_pairwise_distance(seq_dict):
-    names=list(seq_dict.keys())#[:30]
+    names=list(seq_dict.keys())
     dtw_pairs=DTWpairs(names)
     n_ts=len(names)
     for i in range(1,n_ts):
@@ -89,6 +88,17 @@ def basic_exp(in_path):
             print(path_i)
             make_pairs(seq_i,pairs_i)
 
+def concat_pairs(in_path):
+    seq_dict=[ ( path_i.split('/')[-1],
+                 seq.read_seq(f'{path_i}/seqs'))
+                      for path_i in utils.top_files(in_path)]
+    seq_dict=dict(seq_dict)
+    full_seq= seq.concat_seq(seq_dict)
+    dtw_pairs=make_pairwise_distance(full_seq)
+    dtw_pairs.save(f'{in_path}/all')
+    
+
 if __name__ == "__main__":
     in_path='../DTW'#3DHOI/seqs/corl'
-    basic_exp(in_path)
+#    basic_exp(in_path)
+    concat_pairs(f'{in_path}/MSR')
