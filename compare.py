@@ -16,15 +16,16 @@ def compare_knn(in_path):
 def show_bar(df,step=10,k=0):
     fig, ax = plt.subplots()
     x=np.arange(step)+k*step +1
-    diff=[0.2,0.0,-0.2,-0.4]
+    diff=[0.3,0.15,0.0,-0.15,-0.3]
     labels={'corl':'I',
             'max_z':'II',
             'std':"III",
             'skew':"IV"}
-    for i,col_i in enumerate(['corl','max_z','std','skew']):
+    labels['all']='I+II+III+IV'
+    for i,col_i in enumerate(labels.keys()):#['corl','max_z','std','skew']):
         feat_i=df[col_i].tolist()
         feat_i=feat_i[step*k:step*(k+1)]
-        plt.bar(x - diff[i],feat_i, 0.2, 
+        plt.bar(x - diff[i],feat_i, 0.15, 
                 label = labels[col_i]) 
     plt.title('DTW KNN on MSR-Action3D dataset')
     plt.xticks(x, [str(x_i) for x_i in x]) 
@@ -49,4 +50,4 @@ def show_scatter(df):
 if __name__ == "__main__":
     in_path=f'../DTW'#{datasets[k]}'
     print(in_path)
-    compare_knn(f'{in_path}/MSR')
+    compare_knn(f'{in_path}/3DHOI')
