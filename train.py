@@ -3,6 +3,7 @@ from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
 from sklearn.svm import SVC
 import numpy as np
+import os.path
 import dtw,seq,utils
 
 def dtw_knn(in_path:str,verbose=0):
@@ -11,7 +12,7 @@ def dtw_knn(in_path:str,verbose=0):
     for type_i,pairs_i in all_pairs.items():
         y_pred,y_test=pairs_i.knn()
         metric_i=get_metrics(y_test,y_pred)
-        lines.append(f'dtw_knn,{type_i},{metric_i}')
+        lines.append(f'dtw_knn,-,{type_i},{metric_i}')
     if(verbose):
         print('\n'.join(lines))
     return lines
@@ -23,28 +24,37 @@ def dtw_feats(in_path,n_feats=None,verbose=0):
         feat_i= pairs_i.get_features()
         if(not (n_feats is None)):
             feat_i=feat_i.selection(n_feats=n_feats)
+            dim_i=n_feats
+        else:
+            dim_i=feat_i.dim()
+            print(n_feats)
         y_pred,y_test=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
-        lines.append(f'dtw_feats,{type_i},{metric_i}')
+        lines.append(f'dtw_feats,{dim_i},{type_i},{metric_i}')
     if(verbose):
         print('\n'.join(lines))
     return lines
 
-def hc_feats(in_path,verbose=0):
+def hc_feats(in_path,verbose=0,partial=False):
+    if(partial):
+        metric_fun=partial_metrics
+    else:
+        metric_fun=get_metrics
     all_feats=read_feats(in_path)
     lines=[]
     for type_i,feat_i in all_feats.items():
         y_test,y_pred=train_clf(feat_i)
-        metric_i=partial_metrics(y_test,y_pred)
-        lines.append(f'hc_feats,{type_i},{metric_i}')
+        metric_i=metric_fun(y_test,y_pred)
+        dim_i=feat_i.dim()
+        lines.append(f'hc_feats,{dim_i},{type_i},{metric_i}')
     if(verbose):
         print('\n'.join(lines))    
     return lines
 
 def read_feats(in_path):
-    all_seqs={ path_i.split('/')[-1]:
-                seq.read_seq(f'{path_i}/seqs')
-          for path_i in utils.top_files(in_path)}
+    all_seqs={ name_i:seq.read_seq(f'{path_i}/seqs')
+          for name_i,path_i in utils.iter_paths(in_path)
+            if(os.path.exists(f'{path_i}/seqs'))}
     all_feats={name_i:seqs_i.as_features()
                  for name_i,seqs_i in all_seqs.items()}
     all_feats['all']=seq.concat_feat(all_feats)
@@ -81,14 +91,21 @@ def train_clf(feat_dict):
 def base_exp(in_path,datasets=None):
     if(datasets is None):
         datasets=['MSR','MHAD','3DHOI']
-    algs=[hc_feats]#hc_feats,dtw_knn,dtw_feats]
+#    algs=[hc_feats]
+    algs=[hc_feats,dtw_knn,dtw_feats]
+    txt=[]
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
         for alg_j in algs:
             lines=alg_j(path_i)
             lines=[ f'{data_i},{line_k}' 
                     for line_k in lines]
-            print('\n'.join(lines))
+            txt.append('\n'.join(lines))
+            print(txt[-1])
+    print("**************************")
+    for txt_i in txt:
+        print(txt_i)
 
 if __name__ == "__main__":
+    in_path='../DTW/'
     base_exp(in_path)
