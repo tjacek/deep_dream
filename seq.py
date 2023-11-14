@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.stats import skew,pearsonr
 from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+from sklearn import preprocessing
+
 from sklearn.svm import SVR
 import utils
 
@@ -29,6 +32,10 @@ class FeatDict(dict):
     def __init__(self, arg=[]):
         super(FeatDict, self).__init__(arg)
 
+    def dim(self):
+        feat_i= list(self.values())[0]
+        return feat_i.shape[-1]
+
     def as_dataset(self):
         X,y=[],[]
         for name_i,data_i in self.items():
@@ -41,18 +48,24 @@ class FeatDict(dict):
         return np.array(X),y
 
     def selection(self,n_feats=100):
-        estimator = SVR(kernel="linear")
+        estimator = LogisticRegression(solver='liblinear')#SVR(kernel="linear")
         selector = RFE(estimator=estimator, 
                        n_features_to_select=n_feats, 
                        step=1)
         train,test=self.split()
         X_train,y_test=train.as_dataset()
+        X_train= preprocessing.RobustScaler().fit_transform(X_train)
+
+        print(X_train.shape)
         selector = selector.fit(X_train, y_test)
         X,y=self.as_dataset() 
-        new_X=selector.transform(X) 
+        X= preprocessing.RobustScaler().fit_transform(X)
+
+        new_X=selector.transform(X)
+#        new_X=[x_i for x_i in new_X]
         names=self.names()
         raw_dict={name_i:x_i 
-             for name_i,x_i in zip(new_X,names)}
+             for name_i,x_i in zip(names,new_X)}
         return FeatDict(raw_dict)
 
     def names(self):

@@ -1,6 +1,7 @@
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix
 #from sklearn.metrics import classification_report#
+from sklearn import preprocessing
 from sklearn.svm import SVC
 import numpy as np
 import os.path
@@ -27,7 +28,6 @@ def dtw_feats(in_path,n_feats=None,verbose=0):
             dim_i=n_feats
         else:
             dim_i=feat_i.dim()
-            print(n_feats)
         y_pred,y_test=train_clf(feat_i)
         metric_i=get_metrics(y_test,y_pred)
         lines.append(f'dtw_feats,{dim_i},{type_i},{metric_i}')
@@ -83,6 +83,8 @@ def train_clf(feat_dict):
     train_dict,test_dict=feat_dict.split()
     X_train,y_train=train_dict.as_dataset()
     X_test,y_test=test_dict.as_dataset()
+    X_train= preprocessing.RobustScaler().fit_transform(X_train)
+    X_test= preprocessing.RobustScaler().fit_transform(X_test)
     clf_i=SVC()
     clf_i.fit(X_train,y_train)
     y_pred=clf_i.predict(X_test)
@@ -91,7 +93,6 @@ def train_clf(feat_dict):
 def base_exp(in_path,datasets=None):
     if(datasets is None):
         datasets=['MSR','MHAD','3DHOI']
-#    algs=[hc_feats]
     algs=[hc_feats,dtw_knn,dtw_feats]
     txt=[]
     for data_i in datasets:
@@ -106,6 +107,24 @@ def base_exp(in_path,datasets=None):
     for txt_i in txt:
         print(txt_i)
 
+def rfe_exp(in_path,n_feats=350,datasets=None):
+    if(datasets is None):
+        datasets=['MSR','MHAD','3DHOI']
+    def helper(path_j):
+        pairs_j=dtw.read_pairs(f'{path_j}/pairs')
+        feat_j=pairs_j.get_features()
+        feat_j=feat_j.selection(n_feats=200)
+        return feat_j
+    for data_i in datasets:
+        path_i=f'{in_path}/{data_i}'
+        feat_dict={ name_j:helper(path_j)
+                    for name_j,path_j in utils.iter_paths(path_i)
+                      if(name_j!='all')}
+        all_feats=seq.concat_feat(feat_dict)
+        y_pred,y_test=train_clf(all_feats)
+        metric_i=get_metrics(y_test,y_pred)
+        print(f'dtw_feats,{all_feats.dim()},all,{metric_i}')
+
 if __name__ == "__main__":
     in_path='../DTW/'
-    base_exp(in_path)
+    rfe_exp(in_path)
