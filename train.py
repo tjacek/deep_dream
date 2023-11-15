@@ -83,12 +83,14 @@ def train_clf(feat_dict):
     train_dict,test_dict=feat_dict.split()
     X_train,y_train=train_dict.as_dataset()
     X_test,y_test=test_dict.as_dataset()
+#    X_train=utils.rescale(X_train,type="standard")
     X_train= preprocessing.RobustScaler().fit_transform(X_train)
     X_test= preprocessing.RobustScaler().fit_transform(X_test)
     clf_i=SVC()
     clf_i.fit(X_train,y_train)
     y_pred=clf_i.predict(X_test)
     return y_test,y_pred
+
 
 def base_exp(in_path,datasets=None):
     if(datasets is None):
@@ -109,11 +111,11 @@ def base_exp(in_path,datasets=None):
 
 def rfe_exp(in_path,n_feats=350,datasets=None):
     if(datasets is None):
-        datasets=['MSR','MHAD','3DHOI']
+        datasets=['3DHOI']#,'MSR','MHAD']
     def helper(path_j):
         pairs_j=dtw.read_pairs(f'{path_j}/pairs')
         feat_j=pairs_j.get_features()
-        feat_j=feat_j.selection(n_feats=200)
+#        feat_j=feat_j.selection(n_feats=100)
         return feat_j
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
@@ -122,8 +124,8 @@ def rfe_exp(in_path,n_feats=350,datasets=None):
                       if(name_j!='all')}
         all_feats=seq.concat_feat(feat_dict)
         y_pred,y_test=train_clf(all_feats)
-        metric_i=get_metrics(y_test,y_pred)
-        print(f'dtw_feats,{all_feats.dim()},all,{metric_i}')
+#        metric_i=get_metrics(y_test,y_pred)
+#        print(f'dtw_feats,{all_feats.dim()},all,{metric_i}')
 
 if __name__ == "__main__":
     in_path='../DTW/'
