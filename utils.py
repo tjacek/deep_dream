@@ -9,6 +9,11 @@ def top_files(path):
     paths=sorted(paths)
     return paths
 
+def iter_paths(dir_path):
+    for path_i in top_files(dir_path):
+        name_i=path_i.split('/')[-1]
+        yield name_i,path_i
+
 def split(names):
     train,test=[],[]
     for name_i in names:

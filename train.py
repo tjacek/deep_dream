@@ -91,6 +91,13 @@ def train_clf(feat_dict):
     y_pred=clf_i.predict(X_test)
     return y_test,y_pred
 
+def rescale(X,type='robust'):
+    if(type=='robust'):
+        X=preprocessing.RobustScaler().fit_transform(X)
+    else:
+#        X=VarianceThreshold(threshold=0).fit_transform(X)
+        X = preprocessing.StandardScaler().fit_transform(X)
+    return X
 
 def base_exp(in_path,datasets=None):
     if(datasets is None):
@@ -115,7 +122,7 @@ def rfe_exp(in_path,n_feats=350,datasets=None):
     def helper(path_j):
         pairs_j=dtw.read_pairs(f'{path_j}/pairs')
         feat_j=pairs_j.get_features()
-#        feat_j=feat_j.selection(n_feats=100)
+        feat_j=feat_j.selection(n_feats=100)
         return feat_j
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
@@ -124,8 +131,8 @@ def rfe_exp(in_path,n_feats=350,datasets=None):
                       if(name_j!='all')}
         all_feats=seq.concat_feat(feat_dict)
         y_pred,y_test=train_clf(all_feats)
-#        metric_i=get_metrics(y_test,y_pred)
-#        print(f'dtw_feats,{all_feats.dim()},all,{metric_i}')
+        metric_i=get_metrics(y_test,y_pred)
+        print(f'dtw_feats,{all_feats.dim()},all,{metric_i}')
 
 if __name__ == "__main__":
     in_path='../DTW/'
