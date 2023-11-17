@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-import hc,utils
+from scipy.stats import skew,pearsonr
+import utils
 
 class ActionDict(dict):
     def __init__(self, arg=[]):
@@ -35,6 +36,15 @@ def nonzero_points(frame_i):
     z_nozero=frame_i[xy_nonzero]
     xy_nonzero,z_nozero=np.array(xy_nonzero),np.expand_dims(z_nozero,axis=0)
     return np.concatenate([xy_nonzero,z_nozero],axis=0)
+
+def moments(points):
+    std_i=list(np.std(points,axis=1))
+    skew_i=list(skew(points,axis=1))
+    return std_i+skew_i
+
+def corl(points):
+    x,y,z=points[0],points[1],points[2]
+    return [pearsonr(x,y)[0],pearsonr(z,y)[0],pearsonr(x,z)[0]]
 
 in_path='../MSR/frames'
 action_dict= read_action(in_path)
