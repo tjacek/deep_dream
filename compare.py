@@ -14,6 +14,9 @@ def compare_knn(in_path):
     show_bar(df,k=0)
 
 def show_bar(df,step=10,k=0):
+    title='1-NN-DTW dla MSR-Action3D - klasy 1-10'
+    xlabel='Klasa'
+    ylabel='Dokładność'
     fig, ax = plt.subplots()
     x=np.arange(step)+k*step +1
     diff=[0.3,0.15,0.0,-0.15,-0.3]
@@ -22,15 +25,15 @@ def show_bar(df,step=10,k=0):
             'std':"III",
             'skew':"IV"}
     labels['all']='I+II+III+IV'
-    for i,col_i in enumerate(labels.keys()):#['corl','max_z','std','skew']):
+    for i,col_i in enumerate(labels.keys()):
         feat_i=df[col_i].tolist()
         feat_i=feat_i[step*k:step*(k+1)]
         plt.bar(x - diff[i],feat_i, 0.15, 
                 label = labels[col_i]) 
-    plt.title('DTW KNN on MSR-Action3D dataset')
+    plt.title(title)#'1-NN-DTW on MSR-Action3D dataset')
     plt.xticks(x, [str(x_i) for x_i in x]) 
-    plt.xlabel("Class") 
-    plt.ylabel("Accuracy") 
+    plt.xlabel(xlabel)#("Class") 
+    plt.ylabel(ylabel) #"Accuracy") 
     plt.legend() 
     plt.show()
 
@@ -50,4 +53,4 @@ def show_scatter(df):
 if __name__ == "__main__":
     in_path=f'../DTW'#{datasets[k]}'
     print(in_path)
-    compare_knn(f'{in_path}/3DHOI')
+    compare_knn(f'{in_path}/MSR')
