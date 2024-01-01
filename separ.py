@@ -14,12 +14,9 @@ def polar_cord(X):
     polar=[]
     for x_i,y_i in X:
         r_i=np.sqrt(x_i**2+y_i**2)
-#        φ=np.arccos(x_i/r_i)
         φ=np.arctan2(x_i,y_i)
         polar.append([r_i,φ])
-#        print(x_i-r_i*np.cos(φ))
-    return np.array(polar)
-	          
+    return np.array(polar)	          
 
 def show(X,y,xlabel='x',ylabel='y'):
     plt.clf()
@@ -27,8 +24,8 @@ def show(X,y,xlabel='x',ylabel='y'):
     plt.scatter(X_zero[:,0], X_zero[:,1])
     X_one=X[y==1]
     plt.scatter(X_one[:,0], X_one[:,1])
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    plt.xlabel(xlabel,fontsize=18)
+    plt.ylabel(ylabel,fontsize=18)
     plt.show()
 
 X=gen_points(200)
@@ -36,5 +33,4 @@ y=get_y(X)
 show(X,y)
 
 X_polar=polar_cord(X)
-#print(X_polar)
 show(X_polar,y,xlabel='r',ylabel='φ')
