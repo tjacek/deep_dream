@@ -11,14 +11,15 @@ def compare_knn(in_path):
         metric_i=train.partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
     df= pd.DataFrame.from_dict(metric_dict)
-    show_bar(df,k=0)
+    show_bar(df,step=20,k=0)
 
 def show_bar(df,step=10,k=0):
-    title='1-NN-DTW dla MSR-Action3D - klasy 1-10'
+    title='1-NN-DTW dla MSR-Action3D'# - klasy 1-10'
     xlabel='Klasa'
     ylabel='Dokładność'
     fig, ax = plt.subplots()
     x=np.arange(step)+k*step +1
+    plt.rcParams.update({'font.size': 20})
     diff=[0.3,0.15,0.0,-0.15,-0.3]
     labels={'corl':'I',
             'max_z':'II',
@@ -31,9 +32,10 @@ def show_bar(df,step=10,k=0):
         plt.bar(x - diff[i],feat_i, 0.15, 
                 label = labels[col_i]) 
     plt.title(title)#'1-NN-DTW on MSR-Action3D dataset')
-    plt.xticks(x, [str(x_i) for x_i in x]) 
-    plt.xlabel(xlabel)#("Class") 
-    plt.ylabel(ylabel) #"Accuracy") 
+    plt.xticks(x, [str(x_i) for x_i in x],fontsize=20) 
+    plt.tick_params(axis='both', which='major', labelsize=20)
+    plt.xlabel(xlabel,fontsize=20) 
+    plt.ylabel(ylabel,fontsize=20) 
     plt.legend() 
     plt.show()
 
