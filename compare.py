@@ -3,18 +3,30 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import train
 
-def compare_knn(in_path):
+def compare_knn(in_path,alg_type='1-NN-DTW'):
     all_pairs=train.read_pairs(in_path)
     metric_dict={}
+    alg=get_alg(alg_type)
     for type_i,pairs_i in all_pairs.items():
-        y_pred,y_test=pairs_i.knn()
+        y_pred,y_test=alg(pairs_i)
         metric_i=train.partial_metrics(y_test,y_pred)
         metric_dict[type_i]=metric_i
     df= pd.DataFrame.from_dict(metric_dict)
-    show_bar(df,step=20,k=0)
+    show_bar(df,step=20,k=0,alg_type=alg_type)
 
-def show_bar(df,step=10,k=0):
-    title='1-NN-DTW dla MSR-Action3D'# - klasy 1-10'
+def get_alg(alg_type):
+    if(alg_type=='1-NN-DTW'):
+        return lambda pairs_i:pairs_i.knn()
+    def dtw_feats(pairs_i):
+        feat_i= pairs_i.get_features()
+        print(len(feat_i))
+        feat_i=feat_i.selection(n_feats=350)
+        print(len(feat_i))
+        return train.train_clf(feat_i)
+    return dtw_feats
+
+def show_bar(df,step=10,k=0,alg_type='1-NN-DTW'):
+    title=f'{alg_type} dla MSR-Action3D'# - klasy 1-10'
     xlabel='Klasa'
     ylabel='Dokładność'
     fig, ax = plt.subplots()
@@ -55,4 +67,4 @@ def show_scatter(df):
 if __name__ == "__main__":
     in_path=f'../DTW'#{datasets[k]}'
     print(in_path)
-    compare_knn(f'{in_path}/MSR')
+    compare_knn(f'{in_path}/MSR',alg_type='DTW FEATS')
