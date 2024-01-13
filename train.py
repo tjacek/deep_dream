@@ -65,6 +65,12 @@ def read_pairs(in_path):
                 dtw.read_pairs(f'{path_i}/pairs')
               for path_i in utils.top_files(in_path)} 
 
+def inspect_pairs(in_path):
+    all_pairs=read_pairs(in_path)
+    for type_i,pairs_i in all_pairs.items():
+        feat_i= pairs_i.get_features()
+        print(feat_i.dim())
+
 def get_metrics(y_true,y_pred):
     acc_i=accuracy_score(y_true,y_pred)
     metrics_i=precision_recall_fscore_support(y_true=y_true,
@@ -122,7 +128,7 @@ def rfe_exp(in_path,n_feats=350,datasets=None):
     def helper(path_j):
         pairs_j=dtw.read_pairs(f'{path_j}/pairs')
         feat_j=pairs_j.get_features()
-        feat_j=feat_j.selection(n_feats=100)
+#        feat_j=feat_j.selection(n_feats=100)
         return feat_j
     for data_i in datasets:
         path_i=f'{in_path}/{data_i}'
