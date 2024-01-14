@@ -1,28 +1,35 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import train
+import train,seq
 
 def compare_knn(in_path,alg_type='1-NN-DTW'):
     all_pairs=train.read_pairs(in_path)
     metric_dict={}
     alg=get_alg(alg_type)
-    for type_i,pairs_i in all_pairs.items():
-        y_pred,y_test=alg(pairs_i)
+    for type_i,(y_pred,y_test) in alg(all_pairs):
         metric_i=train.partial_metrics(y_test,y_pred)
-        metric_dict[type_i]=metric_i
+        metric_dict[type_i]=metric_i        
     df= pd.DataFrame.from_dict(metric_dict)
+    print(df)
+    print(np.argmax(df.to_numpy(),axis=1))
     show_bar(df,step=20,k=0,alg_type=alg_type)
 
 def get_alg(alg_type):
     if(alg_type=='1-NN-DTW'):
-        return lambda pairs_i:pairs_i.knn()
-    def dtw_feats(pairs_i):
-        feat_i= pairs_i.get_features()
-        print(len(feat_i))
-        feat_i=feat_i.selection(n_feats=350)
-        print(len(feat_i))
-        return train.train_clf(feat_i)
+        def knn_partial(all_pairs):
+            for type_i,pairs_i in all_pairs.items():
+                yield type_i,pairs_i.knn()
+        return knn_partial
+    def dtw_feats(all_pairs):
+        all_feats=[]
+        for type_i,pairs_i in all_pairs.items():
+            if(type_i!='all'):
+                feat_i= pairs_i.get_features()
+                yield type_i, train.train_clf(feat_i)
+                all_feats.append(feat_i)
+        all_feats=seq.concat_feat(all_feats)
+        yield 'all',train.train_clf(all_feats)
     return dtw_feats
 
 def show_bar(df,step=10,k=0,alg_type='1-NN-DTW'):
@@ -67,4 +74,5 @@ def show_scatter(df):
 if __name__ == "__main__":
     in_path=f'../DTW'#{datasets[k]}'
     print(in_path)
+#    train.inspect_pairs(f'{in_path}/MSR')
     compare_knn(f'{in_path}/MSR',alg_type='DTW FEATS')

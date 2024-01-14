@@ -83,6 +83,7 @@ def get_metrics(y_true,y_pred):
 def partial_metrics(y_true,y_pred):    
     cf = confusion_matrix(y_true, y_pred)
     partial_acc=cf.diagonal()/cf.sum(axis=1)
+    partial_acc[np.isnan(partial_acc)]=0.0
     return partial_acc
 
 def train_clf(feat_dict):
