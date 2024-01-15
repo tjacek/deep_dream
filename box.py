@@ -2,12 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd  
 
-def box_plot(csv_path,name,size=15):
+def box_plot(csv_path,name,size=15,bounds=None):
     df=pd.read_csv(csv_path)
     datasets,labels=clean_data(df)
     plt.rcParams.update({'font.size': size})
-#    datasets,labels=datasets[7:],labels[7:]
+    if(bounds):
+        x,y=bounds
+        datasets,labels=datasets[x:y],labels[x:y]
     fig, ax = plt.subplots()
+#    plt.figure(figsize=(9,5))
     ax.boxplot(datasets,
                notch=False, 
                patch_artist=True)
@@ -18,6 +21,7 @@ def box_plot(csv_path,name,size=15):
                     rotation=45,
                     ha='right',
                     rotation_mode='anchor')
+#    plt.axis('square')
     plt.tight_layout()
     plt.show()  
     plt.close()
@@ -57,6 +61,8 @@ def violin_plot(csv_path,name):
     ax.set_ylabel('[%]')
     plt.show()
 
-name='OpenML'
-csv_path='csv/openml_imb.csv'
-box_plot(csv_path,name,size=10)
+name='UCI'
+csv_path='csv/uci_imb.csv'
+box_plot(csv_path,name,
+         size=10,
+         bounds=(0,7))
