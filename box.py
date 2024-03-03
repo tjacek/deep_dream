@@ -24,8 +24,11 @@ def box_plot(csv_path,name,size=15,out_path=None,bounds=None):
     ax.margins(x=0,y=0)
 
     plt.tight_layout()
-    matplotlib.rcParams['figure.dpi'] = 300
-    plt.show()
+    matplotlib.rcParams['figure.dpi'] = 450
+    if(out_path):
+        plt.savefig(out_path)
+    else:
+        plt.show()
 
 def clean_data(df):
     datasets,labels=[],[]
@@ -63,8 +66,8 @@ def violin_plot(csv_path,name):
 
 
 name='UCI'
-csv_path='csv/uci_imb.csv'
+csv_path='csv/openml_imb.csv'
 box_plot(csv_path,name,
          size=20,
-         out_path="test.png",
+         out_path=None,#"test.png",
          bounds=None)#(0,7))
