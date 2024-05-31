@@ -1,6 +1,7 @@
 import keras
-from keras import ops
+#from keras import ops
 from keras import layers
+import tensorflow.keras as tk
 
 class TransformerBlock(layers.Layer):
     def __init__(self, embed_dim, 
@@ -44,7 +45,7 @@ def make_model(vocab_size = 20000,
 	           embed_dim = 32,
                num_heads = 2,
                ff_dim = 32 ):
-	inputs = layers.Input(shape=(maxlen,))
+    inputs = layers.Input(shape=(maxlen,))
     embedding_layer = TokenAndPositionEmbedding(maxlen, 
     	                                        vocab_size, 
     	                                        embed_dim)
@@ -59,3 +60,13 @@ def make_model(vocab_size = 20000,
     model = keras.Model(inputs=inputs, 
     	                outputs=outputs)
     return model
+
+vocab_size=20000
+maxlen = 200
+
+(x_train, y_train), (x_val, y_val) = tk.datasets.imdb.load_data(num_words=vocab_size)
+x_train = keras.utils.pad_sequences(x_train, maxlen=maxlen)
+x_val = keras.utils.pad_sequences(x_val, maxlen=maxlen)
+model=make_model(vocab_size = vocab_size,  
+                 maxlen = maxlen)
+print(y_train.shape)
