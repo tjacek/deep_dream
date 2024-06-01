@@ -1,7 +1,10 @@
 import keras
-#from keras import ops
+from tensorflow import keras
+from keras import ops
 from keras import layers
 import tensorflow.keras as tk
+#from tk import keras
+#import tensorflow.compat.v2 as tf
 
 class TransformerBlock(layers.Layer):
     def __init__(self, embed_dim, 
@@ -70,3 +73,8 @@ x_val = keras.utils.pad_sequences(x_val, maxlen=maxlen)
 model=make_model(vocab_size = vocab_size,  
                  maxlen = maxlen)
 print(y_train.shape)
+
+model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+history = model.fit(
+    x_train, y_train, batch_size=32, epochs=2, validation_data=(x_val, y_val)
+)
