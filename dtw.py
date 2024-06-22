@@ -1,7 +1,7 @@
 #import dtaidistance #import dtw, dtw_ndim
 import numpy as np
 from dtaidistance import dtw_ndim
-import json
+import json, gzip
 import seq,utils
 
 class DTWpairs(object):
@@ -16,6 +16,9 @@ class DTWpairs(object):
     def __len__(self):
         return len(self.pairs)
 
+    def names(self):
+        return list(self.pairs.keys())
+
     def set(self,key1,key2,data_i):
         self.pairs[key1][key2]=data_i
 
@@ -23,7 +26,7 @@ class DTWpairs(object):
         return self.pairs[key1][key2]
 
     def get_features(self):
-        names=list(self.pairs.keys())
+        names=self.mames()
         train,test=utils.split(names)
         feat_dict={}
         for name_i in names:
@@ -48,6 +51,16 @@ class DTWpairs(object):
     def save(self,out_path:str):
     	with open(out_path, 'w') as f:
             json.dump(self.pairs,f)
+
+    def save_eff(self,out_path:str):
+        names=self.names()
+        float_arr=[]
+        for i,name_i in enumerate(names):
+            for name_j in names[i:]:
+                float_arr.append(self.get(name_i,name_j))
+        float_arr=np.array(float_arr)
+        save_dict={"float_arr":float_arr,'names':names}
+        np.savez_compressed(out_path,**save_dict)          
 
     def __str__(self):
         return str(self.pairs)	
