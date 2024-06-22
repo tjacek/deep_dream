@@ -72,7 +72,26 @@ def make_pairs(in_path,out_path=None):
         dtw_pairs.save(out_path)
     return dtw_pairs
 
-def read_pairs(in_path):
+def read_pairs(in_path:str):
+    post=in_path.split(".")[-1]
+    if(post=="npz"):
+        return read_npz(in_path)
+    else:
+        return read_json(in_path)
+
+def read_npz(in_path:str):
+    raw_pairs=np.load(in_path)
+    names=raw_pairs['names'].tolist()
+    float_arr=raw_pairs['float_arr']
+    dtw_pairs=DTWpairs(names)
+    k=0
+    for i,name_i in enumerate(names):
+        for j,name_j in enumerate(names[i:]):
+            dtw_pairs.set(name_i,name_j,float_arr[k])
+            k+=1
+    return dtw_pairs
+
+def read_json(in_path:str):    
     with open(in_path) as f:
         raw_pairs = json.load(f)
         return DTWpairs(raw_pairs)
