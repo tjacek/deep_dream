@@ -28,6 +28,9 @@ class SeqDict(dict):
                     if(len(seq_i.shape)>1)}
         return FeatDict(feat_dict)
 
+    def save(self,out_path):
+        np.savez_compressed(out_path,**self) 
+
 class FeatDict(dict):
     def __init__(self, arg=[]):
         super(FeatDict, self).__init__(arg)
@@ -92,6 +95,20 @@ def concat_feat(all_dicts):
     return full_dict
 
 def read_seq(in_path):
+    post=in_path.split(".")[-1]
+    if(post=="npz"):
+        return read_npz(in_path)
+    else:
+        return read_text(in_path)
+
+def read_npz(in_path:str):
+    raw_seqs=np.load(in_path)
+    seq_dict=SeqDict()
+    for name_i,seq_i in raw_seqs.items():
+        seq_dict[name_i]=seq_i
+    return seq_dict
+
+def read_text(in_path):
     seq_dict=SeqDict()
     for path_i in utils.top_files(in_path):
         name_i=path_i.split('/')[-1]
