@@ -11,12 +11,13 @@ def gen_cf(in_path,alg_type='DTW-FEATS'):
             print(type_i)
             cf=sklearn.metrics.confusion_matrix(y_test, y_pred)
             print(cf)
+#            plt.rcParams.update({'font.size': 22})
             sn.heatmap(cf,
                        cmap="YlGnBu",
                        annot=True,
-                       annot_kws={"size": 5}, 
+                       annot_kws={"size": 12}, 
                        fmt='g')
             plt.show()
 
-in_path=f'../DTW'
+in_path=f'data'
 gen_cf(f'{in_path}/MSR',alg_type='Cechy DTW')    

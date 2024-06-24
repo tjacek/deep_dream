@@ -26,7 +26,7 @@ class DTWpairs(object):
         return self.pairs[key1][key2]
 
     def get_features(self):
-        names=self.mames()
+        names=self.names()
         train,test=utils.split(names)
         feat_dict={}
         for name_i in names:
