@@ -12,11 +12,14 @@ def gen_cf(in_path,alg_type='DTW-FEATS'):
             cf=sklearn.metrics.confusion_matrix(y_test, y_pred)
             print(cf)
 #            plt.rcParams.update({'font.size': 22})
-            sn.heatmap(cf,
+            ax=sn.heatmap(cf,
                        cmap="YlGnBu",
                        annot=True,
                        annot_kws={"size": 12}, 
                        fmt='g')
+            labels=[i+1 for i in range(cf.shape[0])]
+            ax.set_xticklabels(labels)
+            ax.set_yticklabels(labels)
             plt.show()
 
 in_path=f'data'
