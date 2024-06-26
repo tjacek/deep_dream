@@ -96,16 +96,18 @@ def read_json(in_path:str):
         raw_pairs = json.load(f)
         return DTWpairs(raw_pairs)
 
-def make_pairwise_distance(seq_dict):
+def make_pairwise_distance(seq_dict,distance_fun=None):
     names=list(seq_dict.keys())
     dtw_pairs=DTWpairs(names)
     n_ts=len(names)
+    if(distance_fun is None):
+        distance_fun=dtw_ndim.distance
     for i in range(1,n_ts):
         print(i)
         for j in range(0,i):
             name_i,name_j=names[i],names[j]
             seq_i,seq_j=seq_dict[name_i],seq_dict[name_j]
-            distance_ij=dtw_ndim.distance(seq_i,seq_j)
+            distance_ij=distance_fun(seq_i,seq_j)
             dtw_pairs.set(name_i,name_j,distance_ij)
             dtw_pairs.set(name_j,name_i,distance_ij)
     return dtw_pairs  
