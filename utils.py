@@ -14,6 +14,10 @@ def iter_paths(dir_path):
         name_i=path_i.split('/')[-1]
         yield name_i,path_i
 
+def make_dir(path):
+    if(not os.path.isdir(path)):
+        os.mkdir(path)
+
 def split(names):
     train,test=[],[]
     for name_i in names:
