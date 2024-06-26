@@ -1,15 +1,15 @@
 import json,time
+from sklearn.metrics import classification_report
 from dtaidistance import dtw_ndim
-import dtw,seq,utils
-
+import dtw,seq,train,utils
 
 def dtw_exp(in_path:str,
 	        out_path:str,
 	        distance_type="base"):
     seq_dict=seq.read_seq(in_path)
-#    seq_dict= seq_dict.subset(100)
+    seq_dict= seq_dict.subset(30)
     distance_fun=get_distance_fun(distance_type)
-    start = timeit.timeit()
+    start = time.time()
     dtw_pairs=dtw.make_pairwise_distance(seq_dict,
     	                                 distance_fun=distance_fun)
     end = time.time()
@@ -27,7 +27,24 @@ def get_distance_fun(distance_type):
         return dtw_ndim.distance
 
 def eval_pairs(in_path):
-	dtw.read_pairs(in_path)
+    pairs=dtw.read_pairs(in_path)
+    feat= pairs.get_features()
+    y_true,y_pred=train.train_clf(feat)
+    print(classification_report(y_true,y_pred))
 
-in_path="data/MSR/corl/seqs.npz"
-dtw_exp(in_path,'test')
+def multiexp(in_path,out_path):
+    feats_type=['max_z','corl','skew','std']
+    dtw_types=['base']
+    utils.make_dir(out_path)
+    for feat_i in feats_type:
+        in_i=f'{in_path}/{feat_i}/seqs.npz'
+        for dtw_j in dtw_types:
+            out_ij=f'{in_path}/{feat_i}/{dtw_j}'
+            dtw_exp(in_path=in_i,
+	                out_path=out_ij,
+	                distance_type=dtw_j)
+
+multiexp("data/MSR","data/MSR")
+#in_path="data/MSR/corl/seqs.npz"
+#dtw_exp(in_path,'test')
+#eval_pairs('test/pairs')
