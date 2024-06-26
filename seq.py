@@ -28,8 +28,13 @@ class SeqDict(dict):
                     if(len(seq_i.shape)>1)}
         return FeatDict(feat_dict)
 
-    def save(self,out_path):
-        np.savez_compressed(out_path,**self) 
+    def subset(self,keys):
+        if(type(keys)==int):
+            keys= list(self.keys())[:keys]
+        seq_subset=SeqDict()
+        for key_i in keys:
+            seq_subset[key_i]=self[key_i]
+        return seq_subset
 
 class FeatDict(dict):
     def __init__(self, arg=[]):
@@ -87,14 +92,10 @@ class FeatDict(dict):
 
 def concat_feat(all_dicts):
     full_dict=FeatDict()
-    if(type(all_dicts)==list):
-        names=all_dicts[0].keys()
-    else:
-        names=  list(all_dicts.values())[0].keys()
-        all_dicts=all_dicts.values()
+    names=  list(all_dicts.values())[0].keys()
     for name_i in names:
         all_feats=[ dict_j[name_i] 
-            for dict_j in all_dicts]#.values()]
+            for dict_j in all_dicts.values()]
         full_dict[name_i]=np.concatenate(all_feats,axis=0)
     return full_dict
 
@@ -124,7 +125,6 @@ def read_text(in_path):
             seq_i= np.load(path_i)
         seq_dict[name_i]=seq_i
     return seq_dict
-
 def concat_seq(all_dicts):
     full_dict=SeqDict()
     names=  list(all_dicts.values())[0].keys()
