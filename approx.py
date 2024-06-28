@@ -37,7 +37,9 @@ def eval_pairs(in_path):
     pairs=dtw.read_pairs(in_path)
     feat= pairs.get_features()
     y_true,y_pred=train.train_clf(feat)
-    print(classification_report(y_true,y_pred))
+    print(classification_report(y_true,
+                                y_pred,
+                                digits=4))
 
 def multiexp(in_path,out_path):
     feats_type=['max_z','corl','skew','std']
