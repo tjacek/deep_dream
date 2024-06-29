@@ -1,5 +1,5 @@
 import json,time
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report,accuracy_score
 from dtaidistance import dtw_ndim
 from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
@@ -33,13 +33,25 @@ def get_distance_fun(distance_type):
         return dist
     return dtw_ndim.distance
 
-def eval_pairs(in_path):
+
+def eval(paths,verbose=True):
+    results=[]
+    for path_i in paths:
+        name_i=path_i.split('/')[-2]
+        print(path_i)
+        acc_i=eval_pairs(path_i,verbose=True)
+        results.append((name_i,acc_i))
+    print(results)
+
+def eval_pairs(in_path,verbose=True):
     pairs=dtw.read_pairs(in_path)
     feat= pairs.get_features()
     y_true,y_pred=train.train_clf(feat)
-    print(classification_report(y_true,
-                                y_pred,
-                                digits=4))
+    if(verbose):
+        print(classification_report(y_true,
+                                    y_pred,
+                                    digits=4))
+    return accuracy_score(y_true,y_pred)
 
 def multiexp(in_path,out_path):
     feats_type=['max_z','corl','skew','std']
@@ -56,4 +68,7 @@ def multiexp(in_path,out_path):
 #multiexp("data/MSR","data/MSR")
 #in_path="data/MSR/corl/seqs.npz"
 #dtw_exp(in_path,'test')
-eval_pairs('data/MSR/max_z/fast/pairs')
+#eval_pairs('data/MSR/max_z/fast/pairs')
+paths=['data/MSR/max_z/fast/pairs',
+       'data/MSR/skew/fast/pairs']
+eval(paths,verbose=True)
