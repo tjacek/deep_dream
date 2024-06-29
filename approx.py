@@ -35,12 +35,16 @@ def get_distance_fun(distance_type):
 
 
 def eval(paths,verbose=True):
-    results=[]
+    results,all_feats=[],{}
     for path_i in paths:
-        name_i=path_i.split('/')[-2]
+        name_i=path_i.split('/')[-3]
         print(path_i)
-        acc_i=eval_pairs(path_i,verbose=True)
+        acc_i,feat_i=eval_pairs(path_i,verbose=True)
         results.append((name_i,acc_i))
+        all_feats[name_i]=feat_i
+    all_feats= seq.concat_feat(all_feats)
+    y_true,y_pred=train.train_clf(all_feats)
+    results.append(("all",accuracy_score(y_true,y_pred)))
     print(results)
 
 def eval_pairs(in_path,verbose=True):
@@ -51,7 +55,7 @@ def eval_pairs(in_path,verbose=True):
         print(classification_report(y_true,
                                     y_pred,
                                     digits=4))
-    return accuracy_score(y_true,y_pred)
+    return accuracy_score(y_true,y_pred),feat
 
 def multiexp(in_path,out_path):
     feats_type=['max_z','corl','skew','std']
