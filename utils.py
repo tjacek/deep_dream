@@ -33,3 +33,8 @@ def get_person(name_i):
 
 def get_cat(name_i):
     return int(name_i.split('_')[0])
+
+def read_labels(in_path:str):
+    with open(in_path, "r+") as f:
+        text=f.read()
+        return text.split('\n')
