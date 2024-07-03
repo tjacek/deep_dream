@@ -93,13 +93,14 @@ class FeatDict(dict):
 def concat_feat(all_dicts):
     full_dict=FeatDict()
     if(type(all_dicts)==dict):
-        all_dicts=ll_dicts.values()
-        names=  list(all_dicts.values())[0].keys()
+        names=  list(full_dict.values())[0].keys()
+        all_dicts=all_dicts.values()
     else:
-        names=  list(all_dicts)[0].keys()
+        names=  full_dict[0].keys()
+#    names=  list(all_dicts.values())[0].keys()
     for name_i in names:
         all_feats=[ dict_j[name_i] 
-            for dict_j in all_dicts]#.values()]
+            for dict_j in all_dicts.values()]
         full_dict[name_i]=np.concatenate(all_feats,axis=0)
     return full_dict
 
@@ -129,9 +130,14 @@ def read_text(in_path):
             seq_i= np.load(path_i)
         seq_dict[name_i]=seq_i
     return seq_dict
+    
 def concat_seq(all_dicts):
     full_dict=SeqDict()
-    names=  list(all_dicts.values())[0].keys()
+    if(type(all_dicts)==dict):
+        names=  list(all_dicts.values())[0].keys()
+        all_dicts=all_dicts.values()
+    else:
+        names=  all_dicts[0].keys()
     for name_i in names:
         all_seqs=[ dict_j[name_i] 
             for dict_j in all_dicts.values()]
